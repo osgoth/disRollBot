@@ -59,7 +59,3 @@ def roll_character(form: str) -> List[int]:
                 stats.append(sum(rol) - min(rol))
 
     return stats
-
-
-# inp: str = str(input("test your luck >>> "))  # 2d4 : +7 : +
-# print(throw(inp))
