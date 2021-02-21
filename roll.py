@@ -10,12 +10,9 @@ def roll(a, b) -> List[int]:
 
 def mods(string) -> int:
     total = 0
-    oper = True  # True = +; False = -
-    for i in string:
-        if re.match(r"\d", i):
-            total = total + int(i) if oper else total - int(i)
-        elif re.match(r"[+-]", i):
-            oper = True if i == "+" else False
+    modificators = re.split(r"\s*,\s*", string)
+    for mod in modificators:
+        total += int(mod.replace(" ", ""))
     return total
 
 
@@ -28,31 +25,26 @@ def dis_adv(string, rolls, alt_rolls) -> List[int]:
 
 
 def cast_die(string: str) -> str:
-    if re.match(
-        r"(\d+\s*d\s*\d+)\s*(:\s*[+-]\s*\d\s*)?(:\s*[+-])?", string
-    ):  # general pattern
 
-        sects: List[int] = string.split(r":")
-        dice: List[int] = re.split(r"\s*d\s*", sects[0])
-        rolls: List[int] = roll(dice[0], dice[1])
-        fin_rolls = rolls
-        total: int = 0
-        res: str = f"<{str(rolls)}>"
+    sects: List[int] = string.split(r":")
+    dice: List[int] = re.split(r"\s*d\s*", sects[0])
+    rolls: List[int] = roll(dice[0], dice[1])
+    fin_rolls = rolls
+    total: int = 0
+    res: str = f"<{str(rolls)}>"
 
-        for sect in sects:
-            if re.match(r"(\s*[+-]\s*\d\s*)+", sect):
-                total = mods(sect)
-            elif re.match(r"\s*[+-]\s*", sect):
-                alt_rolls = roll(dice[0], dice[1])
-                fin_rolls = dis_adv(sect, alt_rolls, rolls)
-                res += f"<{str(alt_rolls)}>"
-                res += f" => {str(fin_rolls)}"
+    for sect in sects:
+        if re.match(r"(\s*[+-]\s*\d\s*,?\s*)", sect):
+            total = mods(sect)
+        elif re.match(r"\s*[+-]\s*", sect):
+            alt_rolls = roll(dice[0], dice[1])
+            fin_rolls = dis_adv(sect, alt_rolls, rolls)
+            res += f"<{str(alt_rolls)}>"
+            res += f" => {str(fin_rolls)}"
 
-        total += sum(fin_rolls)
+    total += sum(fin_rolls)
 
-        return f"{res} = {total}"
-    else:
-        return "oops"
+    return f"{res} = `{total}`"
 
 
 def roll_character(form: str) -> List[int]:
